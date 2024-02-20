@@ -8,7 +8,7 @@ on:
       - 2024-conf42-python-airflow-testing-dev
   pull_request:
     types:
-      - merged
+      - closed
     branches:
       - 2024-conf42-python-airflow-testing-staging
       - 2024-conf42-python-airflow-testing-prod
