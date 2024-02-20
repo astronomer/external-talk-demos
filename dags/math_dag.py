@@ -1,10 +1,19 @@
+"""
+## DAG that performs basic math operations and writes the result to a table
+"""
+
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.models.param import Param
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from pendulum import datetime
+import logging
+
+# local imports
 from include.custom_operators import MyBasicMathOperator
 from include.utils import get_random_number_from_api
+
+task_logger = logging.getLogger("airflow.task")
 
 POSTGRES_CONN_ID = "postgres_demo"
 
@@ -13,6 +22,7 @@ POSTGRES_CONN_ID = "postgres_demo"
     start_date=datetime(2024, 1, 1),
     schedule="@daily",
     catchup=False,
+    doc_md=__doc__,
     params={
         "upper_limit": Param(100, type="integer"),
         "lower_limit": Param(1, type="integer"),
@@ -28,6 +38,8 @@ def math_dag():
             max=context["params"]["upper_limit"],
             count=1,
         )
+
+        # task_logger.info(f"Random number: {num}")
 
         return num
 
