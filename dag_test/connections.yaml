@@ -1,0 +1,8 @@
+postgres_demo:
+  conn_id: postgres_demo
+  conn_type: "postgres"
+  login: "postgres"
+  password: "postgres"
+  host: "localhost"
+  schema: "postgres"
+  port: 5432

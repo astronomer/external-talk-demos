@@ -38,7 +38,7 @@ def math_dag():
         from airflow.models.variable import Variable
 
         operation = Variable.get("operation", default_var="+")
-        return operation
+        return operation["value"]
 
     retrieve_operation_from_variable_obj = retrieve_operation_from_variable()
 
@@ -57,7 +57,6 @@ def math_dag():
             CREATE TABLE IF NOT EXISTS numbers (
                 number INTEGER
             )""",
-        show_return_value_in_logs=True,
     )
 
     write_to_table = SQLExecuteQueryOperator(
@@ -65,7 +64,6 @@ def math_dag():
         conn_id=POSTGRES_CONN_ID,
         database="postgres",
         sql="INSERT INTO numbers VALUES ({{ task_instance.xcom_pull(task_ids='operate_with_23') }})",
-        show_return_value_in_logs=True,
     )
 
     chain(
@@ -79,13 +77,13 @@ dag_obj = math_dag()
 
 
 if __name__ == "__main__":
-    conn_path = "connections.yaml"
-    variables_path = "variables.yaml"
+    conn_path = "dag_test/connections.yaml"
+    variables_path = "dag_test/variables.yaml"
     upper_limit = 50
     lower_limit = 10
 
     dag_obj.test(
-        execution_date=datetime(2024, 2, 29),
+        # execution_date=datetime(2024, 2, 1),
         conn_file_path=conn_path,
         variable_file_path=variables_path,
         run_conf={"upper_limit": upper_limit, "lower_limit": lower_limit},
