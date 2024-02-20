@@ -1,5 +1,9 @@
 """
-## DAG that performs basic math operations and writes the result to a table
+### DAG that performs basic math operations and writes the result to a table
+
+This DAG is a simple example of how to use a custom operator to perform basic 
+math operations and write the result to a table in a PostgreSQL database.
+Demo: dag.test() and Airflow testing
 """
 
 from airflow.decorators import dag, task
@@ -49,8 +53,19 @@ def math_dag():
     def retrieve_operation_from_variable():
         from airflow.models.variable import Variable
 
-        operation = Variable.get("operation", default_var="+")
-        return operation["value"]
+        operation = Variable.get("operation", default_var=None)
+
+        if not operation:
+            raise ValueError("Operation not found in the Airflow Variables")
+
+        if type(operation) == dict:
+            op = operation.get("value")
+        elif type(operation) == str:
+            op = operation
+        else:
+            raise ValueError("Operation must be a string or a dictionary")
+
+        return op
 
     retrieve_operation_from_variable_obj = retrieve_operation_from_variable()
 
