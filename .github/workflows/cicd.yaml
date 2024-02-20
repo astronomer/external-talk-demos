@@ -1,6 +1,10 @@
 name: Astronomer CI - Deploy code (Multiple Branches)
 
 on:
+  push:
+    branches:
+      - 2024-conf42-python-airflow-testing-staging
+      - 2024-conf42-python-airflow-testing-prod
   pull_request:
     types:
       - merged
@@ -51,3 +55,18 @@ jobs:
         uses: astronomer/deploy-action@v0.2
         with:
           deployment-id: ${{ vars.CONF42_2024_PYTHON_PROD_ASTRO_DEPLOYMENT_ID }}
+  test-each-push:
+    env:
+      ASTRO_API_TOKEN: ${{ secrets.CONF42_2024_PYTHON_STAGE_ASTRO_API_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout our Repo.
+        uses: actions/checkout@v4
+
+      - name: Install the Astro CLI.
+        run: |
+          curl -sSL install.astronomer.io | sudo bash -s
+      
+      - name: Run Astro test harness.
+        run: |
+          astro dev pytest
