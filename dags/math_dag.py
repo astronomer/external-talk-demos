@@ -37,13 +37,16 @@ def math_dag():
     @task
     def pick_a_random_number(**context) -> int:
         "Return a random number within the limits."
+        minimum = context["params"]["lower_limit"]
+        maximum = context["params"]["upper_limit"]
+
         num = get_random_number_from_api(
-            min=context["params"]["lower_limit"],
-            max=context["params"]["upper_limit"],
+            min=minimum,
+            max=maximum,
             count=1,
         )
 
-        # task_logger.info(f"Random number: {num}")
+        # task_logger.critical(f"Random number: {num}")
 
         return num
 
@@ -53,17 +56,10 @@ def math_dag():
     def retrieve_operation_from_variable():
         from airflow.models.variable import Variable
 
-        operation = Variable.get("operation", default_var=None)
+        op = Variable.get("operation", default_var=None)
 
-        if not operation:
+        if not op:
             raise ValueError("Operation not found in the Airflow Variables")
-
-        if type(operation) == dict:
-            op = operation.get("value")
-        elif type(operation) == str:
-            op = operation
-        else:
-            raise ValueError("Operation must be a string or a dictionary")
 
         return op
 
