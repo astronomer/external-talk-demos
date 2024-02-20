@@ -12,7 +12,7 @@ jobs:
   stage-push:
     if: github.ref == 'refs/heads/2024-conf42-python-airflow-testing-staging'
     env:
-      ASTRO_API_TOKEN: ${{ secrets.2024_CONF42_PYTHON_STAGE_ASTRO_API_TOKEN }}
+      ASTRO_API_TOKEN: ${{ secrets.CONF42_2024_PYTHON_STAGE_ASTRO_API_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout our Repo.
@@ -29,11 +29,11 @@ jobs:
       - name: Deploy to Astro
         uses: astronomer/deploy-action@v0.2
         with:
-          deployment-id: ${{ vars.2024_CONF42_PYTHON_STAGE_ASTRO_DEPLOYMENT_ID }}
+          deployment-id: ${{ vars.CONF42_2024_PYTHON_STAGE_ASTRO_DEPLOYMENT_ID }}
   prod-merge:
     if: github.event.action == 'closed' && github.event.pull_request.merged == true
     env:
-      ASTRO_API_TOKEN: ${{ secrets.2024_CONF42_PYTHON_PROD_ASTRO_API_TOKEN }}
+      ASTRO_API_TOKEN: ${{ secrets.CONF42_2024_PYTHON_PROD_ASTRO_API_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout our Repo.
@@ -50,4 +50,4 @@ jobs:
       - name: Deploy to Astro
         uses: astronomer/deploy-action@v0.2
         with:
-          deployment-id: ${{ vars.2024_CONF42_PYTHON_PROD_ASTRO_DEPLOYMENT_ID }}
+          deployment-id: ${{ vars.CONF42_2024_PYTHON_PROD_ASTRO_DEPLOYMENT_ID }}
