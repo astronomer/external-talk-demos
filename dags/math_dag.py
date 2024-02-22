@@ -46,8 +46,6 @@ def math_dag():
             count=1,
         )
 
-        # task_logger.critical(f"Random number: {num}")
-
         return num
 
     pick_a_random_number_obj = pick_a_random_number()
@@ -102,11 +100,11 @@ dag_obj = math_dag()
 if __name__ == "__main__":
     conn_path = "dag_test/connections.yaml"
     variables_path = "dag_test/variables.yaml"
-    upper_limit = 50
+    upper_limit = 20
     lower_limit = 10
 
     dag_obj.test(
-        # execution_date=datetime(2024, 2, 1),
+        execution_date=datetime(2025, 2, 1),
         conn_file_path=conn_path,
         variable_file_path=variables_path,
         run_conf={"upper_limit": upper_limit, "lower_limit": lower_limit},
