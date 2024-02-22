@@ -1,10 +1,23 @@
+"""
+### DAG that performs basic math operations and writes the result to a table
+
+This DAG is a simple example of how to use a custom operator to perform basic 
+math operations and write the result to a table in a PostgreSQL database.
+Demo: dag.test() and Airflow testing
+"""
+
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.models.param import Param
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from pendulum import datetime
+import logging
+
+# local imports
 from include.custom_operators import MyBasicMathOperator
 from include.utils import get_random_number_from_api
+
+task_logger = logging.getLogger("airflow.task")
 
 POSTGRES_CONN_ID = "postgres_demo"
 
@@ -13,6 +26,7 @@ POSTGRES_CONN_ID = "postgres_demo"
     start_date=datetime(2024, 1, 1),
     schedule="@daily",
     catchup=False,
+    doc_md=__doc__,
     params={
         "upper_limit": Param(100, type="integer"),
         "lower_limit": Param(1, type="integer"),
@@ -23,9 +37,12 @@ def math_dag():
     @task
     def pick_a_random_number(**context) -> int:
         "Return a random number within the limits."
+        minimum = context["params"]["lower_limit"]
+        maximum = context["params"]["upper_limit"]
+
         num = get_random_number_from_api(
-            min=context["params"]["lower_limit"],
-            max=context["params"]["upper_limit"],
+            min=minimum,
+            max=maximum,
             count=1,
         )
 
@@ -37,8 +54,12 @@ def math_dag():
     def retrieve_operation_from_variable():
         from airflow.models.variable import Variable
 
-        operation = Variable.get("operation", default_var="+")
-        return operation["value"]
+        op = Variable.get("operation", default_var=None)
+
+        if not op:
+            raise ValueError("Operation not found in the Airflow Variables")
+
+        return op
 
     retrieve_operation_from_variable_obj = retrieve_operation_from_variable()
 
@@ -79,11 +100,11 @@ dag_obj = math_dag()
 if __name__ == "__main__":
     conn_path = "dag_test/connections.yaml"
     variables_path = "dag_test/variables.yaml"
-    upper_limit = 50
+    upper_limit = 20
     lower_limit = 10
 
     dag_obj.test(
-        # execution_date=datetime(2024, 2, 1),
+        execution_date=datetime(2025, 2, 1),
         conn_file_path=conn_path,
         variable_file_path=variables_path,
         run_conf={"upper_limit": upper_limit, "lower_limit": lower_limit},
