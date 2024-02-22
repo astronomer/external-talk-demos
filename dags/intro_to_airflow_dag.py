@@ -7,7 +7,7 @@ from include.custom_operators import MyBasicMathOperator
 @dag(
     start_date=datetime(2024, 1, 1),
     schedule="@daily",
-    catchup=True,
+    catchup=False,
 )
 def intro_to_airflow_dag():
 
